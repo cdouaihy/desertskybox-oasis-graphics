@@ -85,12 +85,24 @@ PointCloud * Window::sphere;
 glm::vec3 Window::lightPos(5.0f,5.0f,5.0f);
 glm::mat4 Window::projection; // Projection matrix.
 
-glm::vec3 Window::eye(0, 0, 45); // Camera position.
+glm::vec3 Window::eye(0, 0, 10); // Camera position.
 glm::vec3 Window::center(0, 0, 0); // The point we are looking at.
 glm::vec3 Window::up(0, 1, 0); // The up direction of the camera.
 glm::vec3 Window::start(0,0,0);
 glm::vec2 Window::point(0,0);
 glm::vec3 Window::direction = glm::normalize(center - eye);
+glm::vec3 Window::cameraRight = glm::normalize(glm::cross(up, direction));
+glm::vec3 Window::cameraUp = glm::cross(direction, cameraRight);
+glm::vec3 Window::cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+
+float Window::deltaTime = 0.0f;
+float Window::lastFrame = 0.0f;
+
+float Window::lastX = width/2;
+float Window::lastY = height/2;
+
+float Window::yaw = -90.0f;
+float Window::pitch = 0.0f;
 
 bool Window::isRotate = false;
 bool Window::modeOne = true;
@@ -98,7 +110,7 @@ bool Window::modeTwo = false;
 bool Window::modeThree = false;
 bool Window::isScaled = false;
 bool Window::isSphere = false;
-bool Window::isControl = false;
+bool Window::firstMouse = true;
 int Window::isNorm = false;
 
 float Window::fov = 60;
@@ -108,7 +120,7 @@ std::vector<glm::vec3> Window::anchorPoints;
 std::vector<glm::vec3> Window::pullPoints;
 
 // View matrix, defined by eye, center and up.
-glm::mat4 Window::view = glm::lookAt(Window::eye, Window::eye + Window::direction, Window::up);
+glm::mat4 Window::view = glm::lookAt(Window::eye, Window::eye + Window::cameraFront, Window::up);
 
 GLuint Window::starterProgram;
 GLuint Window::program; // The shader program id.
@@ -427,7 +439,10 @@ void Window::idleCallback()
 {
     double velocity = 3;
     double distance = 0;
-
+    
+    
+    
+                                                                                       
     if(isSphere){
         glm::vec3 i = sphereT->getLocation();
 
@@ -469,7 +484,9 @@ void Window::displayCallback(GLFWwindow* window)
 	// Clear the color and depth buffers.
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 
-    view = glm::lookAt(Window::eye, Window::eye + Window::direction, Window::up);
+    Window::view = glm::lookAt(Window::eye, Window::eye + Window::cameraFront, Window::cameraUp);
+   
+    
 	// Specify the values of the uniform variables we are going to use.
 	glm::mat4 model = sphereGeo->getModel();
 	glm::vec3 color(1,0,0);
@@ -480,45 +497,16 @@ void Window::displayCallback(GLFWwindow* window)
     glUniform3f(glGetUniformLocation(program, "cameraPos"), Window::eye.x, Window::eye.y, Window::eye.z);
     sphereT->draw(program, glm::mat4(1));
     
-    if(isControl){
-        glUseProgram(anchProgram);
-        glUniformMatrix4fv(projectionAnchLoc, 1, GL_FALSE, glm::value_ptr(projection));
-        glUniformMatrix4fv(viewAnchLoc, 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(modelAnchLoc, 1, GL_FALSE, glm::value_ptr(model));
-        sphereAnch->draw(program, glm::mat4(1));
-        
-        glUseProgram(pullProgram);
-        glUniformMatrix4fv(projectionPullLoc, 1, GL_FALSE, glm::value_ptr(projection));
-        glUniformMatrix4fv(viewPullLoc, 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(modelPullLoc, 1, GL_FALSE, glm::value_ptr(model));
-        spherePull->draw(program, glm::mat4(1));
-    }
-    
-    model = glm::mat4(1);
-    glUseProgram(starterProgram);
-    glUniformMatrix4fv(colorLoc, 1, GL_FALSE, glm::value_ptr(color));
-    glUniformMatrix4fv(projectionCurveLoc, 1, GL_FALSE, glm::value_ptr(projection));
-    glUniformMatrix4fv(viewCurveLoc, 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(modelCurveLoc, 1, GL_FALSE, glm::value_ptr(model));
-    curve1->draw();
-    curve2->draw();
-    curve3->draw();
-    curve4->draw();
-    curve5->draw();
-    curve6->draw();
-    curve7->draw();
-    curve8->draw();
-    
    
 
     glUseProgram(skyboxProgram);
     
-    view = glm::mat4(glm::mat3(view));
+    //view = glm::mat4(glm::mat3(view));
     glUniformMatrix4fv(projectionSkyLoc, 1, GL_FALSE, glm::value_ptr(projection));
     glUniformMatrix4fv(viewSkyLoc, 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(modelSkyLoc, 1, GL_FALSE, glm::value_ptr(model));
     
-    skybox->draw();
+    //skybox->draw();
 
 	// Gets events, including input such as keyboard and mouse or window resizing.
 	glfwPollEvents();
@@ -532,8 +520,10 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 	 * Modify below to add your key callbacks.
 	 */
 	// Check for a key press.
-	if (action == GLFW_PRESS)
+	if (action == GLFW_REPEAT)
 	{
+        
+        float cameraSpeed = 0.5f;
 		switch (key)
 		{
 		case GLFW_KEY_ESCAPE:
@@ -558,6 +548,18 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
             modeTwo = false;
             modeThree = true;
             break;
+        case GLFW_KEY_W:
+            Window::eye += cameraSpeed * cameraFront;
+            break;
+        case GLFW_KEY_A:
+            Window::eye -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+            break;
+        case GLFW_KEY_S:
+            Window::eye -= cameraSpeed * cameraFront;
+            break;
+        case GLFW_KEY_D:
+            Window::eye += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+            break;
         case GLFW_KEY_F1:
             // Set currentObj to bunny
             currentObj = bunny;
@@ -576,14 +578,6 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
             }
             else{
                 isSphere = true;
-            }
-            break;
-        case GLFW_KEY_C:
-            if(isControl){
-                isControl = false;
-            }
-            else{
-                isControl = true;
             }
             break;
         case GLFW_KEY_N:
@@ -638,38 +632,35 @@ void Window::mouseCallback(GLFWwindow* window, int button, int action, int mods)
 }
 void Window::cursorCallback(GLFWwindow* window, double xpos, double ypos)
 {
-    float rotAngle;
-    glm::vec3 curr;
-    glm::vec3 direction;
-    point.x = xpos;
-    point.y = ypos;
+    if(firstMouse)
+      {
+          lastX = xpos;
+          lastY = ypos;
+          firstMouse = false;
+      }
     
-    if(isRotate){
-            curr = trackBallMapping(point);
-            direction = curr - start;
-            float velocity = glm::length(direction);
-            if(velocity > 0.0001){
-                glm::vec3 rotAxis;
-                rotAxis = glm::cross(start,curr);
-                rotAngle = glm::dot(start,curr)/
-                                     (glm::length(start) * glm::length(curr));
-                if(rotAngle < -1){
-                    rotAngle = -1;
-                }
-                if(rotAngle > 1){
-                    rotAngle = 1;
-                }
-                rotAngle = glm::acos(rotAngle);
-                
-                glm::vec4 rotCenter = glm::vec4(Window::direction, 0);
-                rotCenter =  glm::rotate(glm::mat4(1.0f), rotAngle, rotAxis) * rotCenter;
-                Window::direction = glm::vec3(rotCenter);
-                Window::view = glm::lookAt(Window::eye, Window::eye + Window::direction, Window::up);
-                glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-                
-            }
-            start = curr;
-    }
+      float xoffset = xpos - lastX;
+      float yoffset = lastY - ypos;
+      lastX = xpos;
+      lastY = ypos;
+
+      float sensitivity = 0.05;
+      xoffset *= sensitivity;
+      yoffset *= sensitivity;
+
+      yaw   += xoffset;
+      pitch += yoffset;
+
+      if(pitch > 89.0f)
+          pitch = 89.0f;
+      if(pitch < -89.0f)
+          pitch = -89.0f;
+
+      glm::vec3 front;
+      front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+      front.y = sin(glm::radians(pitch));
+      front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+      cameraFront = glm::normalize(front);
     
 }
 
