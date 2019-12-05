@@ -106,13 +106,22 @@ public:
     static float lastTime;
     static float currentTime;
     
+    static float deltaTime;
+    static float lastFrame;
+    
+    static float lastX;
+    static float lastY;
+    
+    static float yaw;
+    static float pitch;
+    
 	static glm::mat4 projection;
 	static glm::mat4 view;
-	static glm::vec3 eye, center, up, direction;
+	static glm::vec3 eye, center, up, direction, cameraRight, cameraUp;
     static glm::vec2 point;
     static glm::vec3 start;
     static glm::vec3 lightPos;
-    static bool isRotate, modeOne, modeTwo, modeThree, isScaled, isSphere, isControl;
+    static bool isRotate, modeOne, modeTwo, modeThree, isScaled, isSphere, firstMouse;
     static int isNorm;
     static float fov;
 	static GLuint starterProgram, program, anchProgram, pullProgram, skyboxProgram, projectionLoc, viewLoc, projectionSkyLoc, viewSkyLoc, projectionCurveLoc, viewCurveLoc, modelCurveLoc,projectionAnchLoc, viewAnchLoc, modelAnchLoc, projectionPullLoc, viewPullLoc, modelPullLoc,modelLoc, modelSkyLoc, colorLoc, lightPosLoc, lightColorLoc, viewPosLoc, ambientLoc, diffuseLoc, specularLoc, shinyLoc, condLoc;

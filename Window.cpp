@@ -91,9 +91,6 @@ glm::vec3 Window::up(0, 1, 0); // The up direction of the camera.
 glm::vec3 Window::start(0,0,0);
 glm::vec2 Window::point(0,0);
 glm::vec3 Window::direction = glm::normalize(center - eye);
-glm::vec3 Window::cameraRight = glm::normalize(glm::cross(up, direction));
-glm::vec3 Window::cameraUp = glm::cross(direction, cameraRight);
-glm::vec3 Window::cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 
 float Window::deltaTime = 0.0f;
 float Window::lastFrame = 0.0f;
@@ -120,7 +117,7 @@ std::vector<glm::vec3> Window::anchorPoints;
 std::vector<glm::vec3> Window::pullPoints;
 
 // View matrix, defined by eye, center and up.
-glm::mat4 Window::view = glm::lookAt(Window::eye, Window::eye + Window::cameraFront, Window::up);
+glm::mat4 Window::view = glm::lookAt(Window::eye, Window::eye + Window::direction, Window::up);
 
 GLuint Window::starterProgram;
 GLuint Window::program; // The shader program id.
@@ -484,7 +481,7 @@ void Window::displayCallback(GLFWwindow* window)
 	// Clear the color and depth buffers.
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 
-    Window::view = glm::lookAt(Window::eye, Window::eye + Window::cameraFront, Window::cameraUp);
+    Window::view = glm::lookAt(Window::eye, Window::eye + Window::direction, Window::up);
    
     
 	// Specify the values of the uniform variables we are going to use.
@@ -501,12 +498,12 @@ void Window::displayCallback(GLFWwindow* window)
 
     glUseProgram(skyboxProgram);
     
-    //view = glm::mat4(glm::mat3(view));
+    view = glm::mat4(glm::mat3(view));
     glUniformMatrix4fv(projectionSkyLoc, 1, GL_FALSE, glm::value_ptr(projection));
     glUniformMatrix4fv(viewSkyLoc, 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(modelSkyLoc, 1, GL_FALSE, glm::value_ptr(model));
     
-    //skybox->draw();
+    skybox->draw();
 
 	// Gets events, including input such as keyboard and mouse or window resizing.
 	glfwPollEvents();
@@ -549,16 +546,16 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
             modeThree = true;
             break;
         case GLFW_KEY_W:
-            Window::eye += cameraSpeed * cameraFront;
+            Window::eye += cameraSpeed * direction;
             break;
         case GLFW_KEY_A:
-            Window::eye -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+            Window::eye -= glm::normalize(glm::cross(direction, up)) * cameraSpeed;
             break;
         case GLFW_KEY_S:
-            Window::eye -= cameraSpeed * cameraFront;
+            Window::eye -= cameraSpeed * direction;
             break;
         case GLFW_KEY_D:
-            Window::eye += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+            Window::eye += glm::normalize(glm::cross(direction, up)) * cameraSpeed;
             break;
         case GLFW_KEY_F1:
             // Set currentObj to bunny
@@ -632,35 +629,38 @@ void Window::mouseCallback(GLFWwindow* window, int button, int action, int mods)
 }
 void Window::cursorCallback(GLFWwindow* window, double xpos, double ypos)
 {
-    if(firstMouse)
-      {
-          lastX = xpos;
-          lastY = ypos;
-          firstMouse = false;
-      }
-    
-      float xoffset = xpos - lastX;
-      float yoffset = lastY - ypos;
-      lastX = xpos;
-      lastY = ypos;
-
-      float sensitivity = 0.05;
-      xoffset *= sensitivity;
-      yoffset *= sensitivity;
-
-      yaw   += xoffset;
-      pitch += yoffset;
-
-      if(pitch > 89.0f)
-          pitch = 89.0f;
-      if(pitch < -89.0f)
-          pitch = -89.0f;
-
-      glm::vec3 front;
-      front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-      front.y = sin(glm::radians(pitch));
-      front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-      cameraFront = glm::normalize(front);
+     float rotAngle;
+       glm::vec3 curr;
+       glm::vec3 direction;
+       point.x = xpos;
+       point.y = ypos;
+       
+       if(isRotate){
+               curr = trackBallMapping(point);
+               direction = curr - start;
+               float velocity = glm::length(direction);
+               if(velocity > 0.0001){
+                   glm::vec3 rotAxis;
+                   rotAxis = glm::cross(start,curr);
+                   rotAngle = glm::dot(start,curr)/
+                                        (glm::length(start) * glm::length(curr));
+                   if(rotAngle < -1){
+                       rotAngle = -1;
+                   }
+                   if(rotAngle > 1){
+                       rotAngle = 1;
+                   }
+                   rotAngle = glm::acos(rotAngle);
+                   
+                   glm::vec4 rotCenter = glm::vec4(Window::direction, 0);
+                   rotCenter =  glm::rotate(glm::mat4(1.0f), rotAngle, rotAxis) * rotCenter;
+                   Window::direction = glm::vec3(rotCenter);
+                   Window::view = glm::lookAt(Window::eye, Window::eye + Window::direction, Window::up);
+                   glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+                   
+               }
+               start = curr;
+       }
     
 }
 
