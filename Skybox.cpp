@@ -76,6 +76,17 @@ Skybox::Skybox(){
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     // Unbind from the VAO.
     glBindVertexArray(0);
+	std::vector<std::string> faces
+	{
+		   "Right.2048x2048.png",
+		   "Left.2048x2048.png",
+		   "Up.2048x2048.png",
+		   "Down.2048x2048.png",
+		   "Front.2048x2048.png",
+		   "Back.2048x2048.png"
+	};
+
+	cubemap = loadCubemap(faces);
     
 }
 unsigned int Skybox::loadCubemap(std::vector<std::string> faces)
@@ -118,17 +129,6 @@ unsigned int Skybox::loadCubemap(std::vector<std::string> faces)
 
 void Skybox::draw()
 {
-    std::vector<std::string> faces
-    {
-           "Right.2048x2048.png",
-           "Left.2048x2048.png",
-           "Up.2048x2048.png",
-           "Down.2048x2048.png",
-           "Front.2048x2048.png",
-           "Back.2048x2048.png"
-    };
-    
-    unsigned int cubemap = loadCubemap(faces);
     
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
