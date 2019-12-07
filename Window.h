@@ -26,6 +26,8 @@
 #include "BezierCurve.h"
 #include "shader.h"
 
+#include "irrKlang-64bit-1.6.0/include/irrKlang.h"
+
 class Window
 {
 public:
@@ -114,6 +116,10 @@ public:
     
     static float yaw;
     static float pitch;
+    
+    static int delay;
+    
+    static irrklang::ISoundEngine * SoundEngine;
     
 	static glm::mat4 projection;
 	static glm::mat4 view;

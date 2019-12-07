@@ -1,6 +1,8 @@
 #include "Window.h"
 #include <cmath>
 
+using namespace irrklang;
+
 int Window::width;
 int Window::height;
 
@@ -110,11 +112,15 @@ bool Window::isSphere = false;
 bool Window::firstMouse = true;
 int Window::isNorm = false;
 
+int Window:: delay = 0;
+
 float Window::fov = 60;
 
 std::vector<glm::vec3> Window::anchorPoints;
 
 std::vector<glm::vec3> Window::pullPoints;
+
+ISoundEngine * Window::SoundEngine = createIrrKlangDevice();
 
 // View matrix, defined by eye, center and up.
 glm::mat4 Window::view = glm::lookAt(Window::eye, Window::eye + Window::direction, Window::up);
@@ -346,6 +352,7 @@ bool Window::initializeObjects()
     spherePull->addChild(pullT16);
 
     lastTime = glfwGetTime();
+    SoundEngine->play2D("Action.wav", GL_TRUE);
 	return true;
 }
 
@@ -484,6 +491,7 @@ void Window::displayCallback(GLFWwindow* window)
     Window::view = glm::lookAt(Window::eye, Window::eye + Window::direction, Window::up);
    
     
+    
 	// Specify the values of the uniform variables we are going to use.
 	glm::mat4 model = sphereGeo->getModel();
 	glm::vec3 color(1,0,0);
@@ -547,15 +555,31 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
             break;
         case GLFW_KEY_W:
             Window::eye += cameraSpeed * direction;
+            if(Window::delay % 3 == 0){
+                SoundEngine->play2D("Single-footstep-snow.wav", GL_FALSE);
+            }
+            Window::delay++;
             break;
         case GLFW_KEY_A:
             Window::eye -= glm::normalize(glm::cross(direction, up)) * cameraSpeed;
+            if(Window::delay % 3 == 0){
+                SoundEngine->play2D("Single-footstep-snow.wav", GL_FALSE);
+            }
+            Window::delay++;
             break;
         case GLFW_KEY_S:
             Window::eye -= cameraSpeed * direction;
+            if(Window::delay % 3 == 0){
+                SoundEngine->play2D("Single-footstep-snow.wav", GL_FALSE);
+            }
+            Window::delay++;
             break;
         case GLFW_KEY_D:
             Window::eye += glm::normalize(glm::cross(direction, up)) * cameraSpeed;
+            if(Window::delay % 3 == 0){
+                SoundEngine->play2D("Single-footstep-snow.wav", GL_FALSE);
+            }
+            Window::delay++;
             break;
         case GLFW_KEY_F1:
             // Set currentObj to bunny
@@ -629,38 +653,35 @@ void Window::mouseCallback(GLFWwindow* window, int button, int action, int mods)
 }
 void Window::cursorCallback(GLFWwindow* window, double xpos, double ypos)
 {
-     float rotAngle;
-       glm::vec3 curr;
-       glm::vec3 direction;
-       point.x = xpos;
-       point.y = ypos;
-       
-       if(isRotate){
-               curr = trackBallMapping(point);
-               direction = curr - start;
-               float velocity = glm::length(direction);
-               if(velocity > 0.0001){
-                   glm::vec3 rotAxis;
-                   rotAxis = glm::cross(start,curr);
-                   rotAngle = glm::dot(start,curr)/
-                                        (glm::length(start) * glm::length(curr));
-                   if(rotAngle < -1){
-                       rotAngle = -1;
-                   }
-                   if(rotAngle > 1){
-                       rotAngle = 1;
-                   }
-                   rotAngle = glm::acos(rotAngle);
-                   
-                   glm::vec4 rotCenter = glm::vec4(Window::direction, 0);
-                   rotCenter =  glm::rotate(glm::mat4(1.0f), rotAngle, rotAxis) * rotCenter;
-                   Window::direction = glm::vec3(rotCenter);
-                   Window::view = glm::lookAt(Window::eye, Window::eye + Window::direction, Window::up);
-                   glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-                   
-               }
-               start = curr;
+     if(firstMouse)
+       {
+           lastX = xpos;
+           lastY = ypos;
+           firstMouse = false;
        }
+     
+       float xoffset = xpos - lastX;
+       float yoffset = lastY - ypos;
+       lastX = xpos;
+       lastY = ypos;
+
+       float sensitivity = 0.5;
+       xoffset *= sensitivity;
+       yoffset *= sensitivity;
+
+       yaw   += xoffset;
+       pitch += yoffset;
+
+       if(pitch > 89.0f)
+           pitch = 89.0f;
+       if(pitch < -89.0f)
+           pitch = -89.0f;
+
+       glm::vec3 front;
+       front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+       front.y = sin(glm::radians(pitch));
+       front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+       direction = glm::normalize(front);
     
 }
 
