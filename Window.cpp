@@ -660,17 +660,18 @@ void Window::cursorCallback(GLFWwindow* window, double xpos, double ypos)
            firstMouse = false;
        }
      
-       float xoffset = xpos - lastX;
-       float yoffset = lastY - ypos;
+       float xoff = xpos - lastX;
+       float yoff = lastY - ypos;
+	
        lastX = xpos;
        lastY = ypos;
 
-       float sensitivity = 0.5;
-       xoffset *= sensitivity;
-       yoffset *= sensitivity;
+       float sens = 0.5;
+       xoff *= sens;
+       yoff *= sens;
 
-       yaw   += xoffset;
-       pitch += yoffset;
+       yaw   += xoff;
+       pitch += yoff;
 
        if(pitch > 89.0f)
            pitch = 89.0f;
