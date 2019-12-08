@@ -63,7 +63,7 @@ void BezierCurve::draw(){
     glBindVertexArray(vao);
     // Draw triangles using the indices in the second VBO, which is an
     // element array buffer.
-    glDrawArrays(GL_LINE_STRIP, 0, 501);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 501);
     // Unbind from the VAO.
     glBindVertexArray(0);
 }

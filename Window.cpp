@@ -227,37 +227,37 @@ bool Window::initializeObjects()
     anchorPoints.push_back(glm::vec3(0,0,0));
     anchorPoints.push_back(glm::vec3(15,0,0));
     anchorPoints.push_back(glm::vec3(10,0,10));
-    anchorPoints.push_back(glm::vec3(-10,15,20));
-    anchorPoints.push_back(glm::vec3(-30,15,15));
-    anchorPoints.push_back(glm::vec3(-25,20,5));
-    anchorPoints.push_back(glm::vec3(-10,15,0));
-    anchorPoints.push_back(glm::vec3(0,5,10));
+    anchorPoints.push_back(glm::vec3(-10,0,20));
+    anchorPoints.push_back(glm::vec3(-30,0,15));
+    anchorPoints.push_back(glm::vec3(-25,0,5));
+    anchorPoints.push_back(glm::vec3(-10,0,0));
+    anchorPoints.push_back(glm::vec3(0,0,10));
     
-    pullPoints.push_back(glm::vec3(5,5,0));
-    pullPoints.push_back(glm::vec3(10,7,0));
-    pullPoints.push_back(glm::vec3(25,-5,0));
-    pullPoints.push_back(glm::vec3(10,-17,0));
-    pullPoints.push_back(glm::vec3(0,10,10));
-    pullPoints.push_back(glm::vec3(-5,15,15));
-    pullPoints.push_back(glm::vec3(-20,20,15));
-    pullPoints.push_back(glm::vec3(-25,20,15));
-    pullPoints.push_back(glm::vec3(-35,20,10));
-    pullPoints.push_back(glm::vec3(-30,-20,10));
-    pullPoints.push_back(glm::vec3(-20,-20,5));
-    pullPoints.push_back(glm::vec3(-15,20,5));
-    pullPoints.push_back(glm::vec3(-5,15,5));
-    pullPoints.push_back(glm::vec3(-2,-10,10));
-    pullPoints.push_back(glm::vec3(-4,-5,5));
+    pullPoints.push_back(glm::vec3(5,0,0));
+    pullPoints.push_back(glm::vec3(10,0,0));
+    pullPoints.push_back(glm::vec3(25,0,0));
+    pullPoints.push_back(glm::vec3(10,0,0));
+    pullPoints.push_back(glm::vec3(0,0,10));
+    pullPoints.push_back(glm::vec3(-5,0,15));
+    pullPoints.push_back(glm::vec3(-20,0,15));
+    pullPoints.push_back(glm::vec3(-25,0,15));
+    pullPoints.push_back(glm::vec3(-35,0,10));
+    pullPoints.push_back(glm::vec3(-30,0,10));
+    pullPoints.push_back(glm::vec3(-20,0,5));
+    pullPoints.push_back(glm::vec3(-15,0,5));
+    pullPoints.push_back(glm::vec3(-5,0,5));
+    pullPoints.push_back(glm::vec3(-2,0,10));
+    pullPoints.push_back(glm::vec3(-4,0,5));
     pullPoints.push_back(glm::vec3(6,0,5));
     
     curve1 = new BezierCurve(glm::vec3(0,0,0),pullPoints[0],pullPoints[1],glm::vec3(15,0,0));
     curve2 = new BezierCurve(glm::vec3(15,0,0),pullPoints[2],pullPoints[3],glm::vec3(10,0,10));
-    curve3 = new BezierCurve(glm::vec3(10,0,10),pullPoints[4],pullPoints[5],glm::vec3(-10,15,20));
-    curve4 = new BezierCurve(glm::vec3(-10,15,20),pullPoints[6],pullPoints[7],glm::vec3(-30,15,15));
-    curve5 = new BezierCurve(glm::vec3(-30,15,15),pullPoints[8],pullPoints[9],glm::vec3(-25,20,5));
-    curve6 = new BezierCurve(glm::vec3(-25,20,5),pullPoints[10],pullPoints[11],glm::vec3(-10,15,0));
-    curve7 = new BezierCurve(glm::vec3(-10,15,0),pullPoints[12],pullPoints[13],glm::vec3(0,5,10));
-    curve8 = new BezierCurve(glm::vec3(0,5,10),pullPoints[14],pullPoints[15],glm::vec3(0,0,0));
+    curve3 = new BezierCurve(glm::vec3(10,0,10),pullPoints[4],pullPoints[5],glm::vec3(-10,0,20));
+    curve4 = new BezierCurve(glm::vec3(-10,0,20),pullPoints[6],pullPoints[7],glm::vec3(-30,0,15));
+    curve5 = new BezierCurve(glm::vec3(-30,0,15),pullPoints[8],pullPoints[9],glm::vec3(-25,0,5));
+    curve6 = new BezierCurve(glm::vec3(-25,0,5),pullPoints[10],pullPoints[11],glm::vec3(-10,0,0));
+    curve7 = new BezierCurve(glm::vec3(-10,0,0),pullPoints[12],pullPoints[13],glm::vec3(0,0,10));
+    curve8 = new BezierCurve(glm::vec3(0,0,10),pullPoints[14],pullPoints[15],glm::vec3(0,0,0));
     
     
     
@@ -502,7 +502,20 @@ void Window::displayCallback(GLFWwindow* window)
     glUniform3f(glGetUniformLocation(program, "cameraPos"), Window::eye.x, Window::eye.y, Window::eye.z);
     sphereT->draw(program, glm::mat4(1));
     
-   
+   model = glm::mat4(1);
+   glUseProgram(starterProgram);
+   glUniformMatrix4fv(colorLoc, 1, GL_FALSE, glm::value_ptr(color));
+   glUniformMatrix4fv(projectionCurveLoc, 1, GL_FALSE, glm::value_ptr(projection));
+   glUniformMatrix4fv(viewCurveLoc, 1, GL_FALSE, glm::value_ptr(view));
+   glUniformMatrix4fv(modelCurveLoc, 1, GL_FALSE, glm::value_ptr(model));
+   curve1->draw();
+   curve2->draw();
+   curve3->draw();
+   curve4->draw();
+   curve5->draw();
+   curve6->draw();
+   curve7->draw();
+   curve8->draw();
 
     glUseProgram(skyboxProgram);
     
@@ -660,18 +673,17 @@ void Window::cursorCallback(GLFWwindow* window, double xpos, double ypos)
            firstMouse = false;
        }
      
-       float xoff = xpos - lastX;
-       float yoff = lastY - ypos;
-	
+       float xoffset = xpos - lastX;
+       float yoffset = lastY - ypos;
        lastX = xpos;
        lastY = ypos;
 
-       float sens = 0.5;
-       xoff *= sens;
-       yoff *= sens;
+       float sensitivity = 0.5;
+       xoffset *= sensitivity;
+       yoffset *= sensitivity;
 
-       yaw   += xoff;
-       pitch += yoff;
+       yaw   += xoffset;
+       pitch += yoffset;
 
        if(pitch > 89.0f)
            pitch = 89.0f;

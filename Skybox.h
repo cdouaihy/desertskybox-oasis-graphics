@@ -26,7 +26,7 @@ private:
     unsigned int id;
     GLuint vao;
     GLuint vbo;
-	unsigned int cubemap;
+    unsigned int cubemap;
 public:
     Skybox();
     void draw();

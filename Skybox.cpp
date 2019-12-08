@@ -76,17 +76,17 @@ Skybox::Skybox(){
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     // Unbind from the VAO.
     glBindVertexArray(0);
-	std::vector<std::string> faces
-	{
-		   "Right.2048x2048.png",
-		   "Left.2048x2048.png",
-		   "Up.2048x2048.png",
-		   "Down.2048x2048.png",
-		   "Front.2048x2048.png",
-		   "Back.2048x2048.png"
-	};
+    std::vector<std::string> faces
+    {
+           "sandcastle_lf.tga",
+           "sandcastle_rt.tga",
+           "sandcastle_up.tga",
+           "sandcastle_dn.tga",
+           "sandcastle_ft.tga",
+           "sandcastle_bk.tga"
+    };
 
-	cubemap = loadCubemap(faces);
+    cubemap = loadCubemap(faces);
     
 }
 unsigned int Skybox::loadCubemap(std::vector<std::string> faces)
@@ -123,7 +123,8 @@ unsigned int Skybox::loadCubemap(std::vector<std::string> faces)
     // Use clamp to edge to hide skybox edges:
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    
     return id;
 }
 
