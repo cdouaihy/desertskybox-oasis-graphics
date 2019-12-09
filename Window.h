@@ -25,6 +25,7 @@
 #include "Skybox.h"
 #include "BezierCurve.h"
 #include "shader.h"
+#include "BezierBatch.h"
 
 #include "irrKlang-64bit-1.6.0/include/irrKlang.h"
 
@@ -102,6 +103,8 @@ public:
     static BezierCurve * curve8;
     static int curr;
     static std::vector<BezierCurve *> curves;
+    
+    static BezierBatch * b1;
 
 	static Object * currentObj;
     static Geometry * currentNode;

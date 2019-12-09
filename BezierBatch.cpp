@@ -1,12 +1,12 @@
 //
-//  BezierCurve.cpp
+//  BezierBatch.cpp
 //  Project1
 //
 //  Created by Charbel Douaihy on 11/14/19.
 //  Copyright © 2019 Charbel Douaihy. All rights reserved.
 //
 
-#include "BezierCurve.h"
+#include "BezierBatch.h"
 #include <stdio.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/glm.hpp>
@@ -16,15 +16,15 @@
 #include <sstream>
 #include <iostream>
 
-BezierCurve::BezierCurve(glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3){
+BezierBatch::BezierBatch(BezierCurve * c0, BezierCurve * c1, BezierCurve * c2, BezierCurve * c3){
     
-    points.push_back(p0);
-    points.push_back(p1);
-    points.push_back(p2);
-    points.push_back(p3);
+    curves.push_back(c0);
+    curves.push_back(c1);
+    curves.push_back(c2);
+    curves.push_back(c3);
     
-    for(float i = 0; i <= 500; i++){
-        x.push_back(getPoint(i/500.0));
+    for(float u = 0; u <= 300; u++){
+        getPoint(u/300.0);
     }
     // Generate a vertex array (VAO) and two vertex buffer objects (VBO).
     glGenVertexArrays(1, &vao);
@@ -41,29 +41,25 @@ BezierCurve::BezierCurve(glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
     glBindVertexArray(0);
 }
 
-glm::vec3 BezierCurve::getPoint(float t){
-    glm::vec3 a = -points[0] + 3.0f*points[1] - 3.0f*points[2] + points[3];
-    glm::vec3 b = 3.0f*points[0] - 6.0f*points[1] + 3.0f*points[2];
-    glm::vec3 c = -3.0f*points[0] + 3.0f*points[1];
-    glm::vec3 d = points[0];
-    glm::vec3 output = a*(t*t*t) + b*(t*t) + c*(t) + d;
-    return output;
+void BezierBatch::getPoint(float t){
+    glm::vec3 q0 = curves[0]->getPoint(t);
+    glm::vec3 q1 = curves[1]->getPoint(t);
+    glm::vec3 q2 = curves[2]->getPoint(t);
+    glm::vec3 q3 = curves[3]->getPoint(t);
+    std::vector<glm::vec3> row;
+    for(float v = 0; v <= 300; v++){
+        BezierCurve * c = new BezierCurve(q0,q1,q2,q3);
+        row.push_back(c->getPoint(v/300));
+    }
+    x.push_back(row);
 }
 
-double BezierCurve::getT(glm::vec3 pos){
-    for(int i = 0; i <=500; i++){
-        if(x[i] == pos){
-            return i/500.0;
-        }
-    }
-    return -1;
-}
-void BezierCurve::draw(){
+void BezierBatch::draw(){
     // Bind to the VAO.
     glBindVertexArray(vao);
     // Draw triangles using the indices in the second VBO, which is an
     // element array buffer.
-    glDrawArrays(GL_LINE_STRIP, 0, 501);
+    glDrawArrays(GL_LINE_STRIP, 0, 301);
     // Unbind from the VAO.
     glBindVertexArray(0);
 }
