@@ -89,7 +89,7 @@ PointCloud * Window::sphere;
 glm::vec3 Window::lightPos(5.0f,5.0f,5.0f);
 glm::mat4 Window::projection; // Projection matrix.
 
-glm::vec3 Window::eye(0, 0, 10); // Camera position.
+glm::vec3 Window::eye(0, 5, 20); // Camera position.
 glm::vec3 Window::center(0, 0, 0); // The point we are looking at.
 glm::vec3 Window::up(0, 1, 0); // The up direction of the camera.
 glm::vec3 Window::start(0,0,0);
@@ -506,15 +506,17 @@ void Window::displayCallback(GLFWwindow* window)
     sphereT->draw(program, glm::mat4(1));
     
     model = glm::mat4(1);
-    glUseProgram(starterProgram);
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+    /*glUseProgram(program);
+	/
     glUniformMatrix4fv(colorLoc, 1, GL_FALSE, glm::value_ptr(color));
     glUniformMatrix4fv(projectionCurveLoc, 1, GL_FALSE, glm::value_ptr(projection));
     glUniformMatrix4fv(viewCurveLoc, 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(modelCurveLoc, 1, GL_FALSE, glm::value_ptr(model));
-    curve1->draw();
+    glUniformMatrix4fv(modelCurveLoc, 1, GL_FALSE, glm::value_ptr(model)) */;
+    /*curve1->draw();
     curve2->draw();
     curve3->draw();
-    curve4->draw();
+    curve4->draw();*/
     b1->draw();
 
     glUseProgram(skyboxProgram);

@@ -50,6 +50,15 @@ glm::vec3 BezierCurve::getPoint(float t){
     return output;
 }
 
+glm::vec3 BezierCurve::getTangent(float t) {
+	glm::vec3 a = -points[0] + 3.0f * points[1] - 3.0f * points[2] + points[3];
+	glm::vec3 b = 3.0f * points[0] - 6.0f * points[1] + 3.0f * points[2];
+	glm::vec3 c = -3.0f * points[0] + 3.0f * points[1];
+	glm::vec3 d = points[0];
+	glm::vec3 output = (a * (3.0f) * (t * t)) + (b * 2.0f * t) + c;
+	return output;
+}
+
 double BezierCurve::getT(glm::vec3 pos){
     for(int i = 0; i <=500; i++){
         if(x[i] == pos){

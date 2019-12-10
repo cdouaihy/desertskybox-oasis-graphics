@@ -22,7 +22,14 @@ BezierBatch::BezierBatch(BezierCurve * c0, BezierCurve * c1, BezierCurve * c2, B
     curves.push_back(c1);
     curves.push_back(c2);
     curves.push_back(c3);
-    
+	BezierCurve* d0 = new BezierCurve(c0->points[0], c1->points[0], c2->points[0], c3->points[0]);
+	BezierCurve* d1 = new BezierCurve(c0->points[1], c1->points[1], c2->points[1], c3->points[1]);
+	BezierCurve* d2 = new BezierCurve(c0->points[2], c1->points[2], c2->points[2], c3->points[2]);
+	BezierCurve* d3 = new BezierCurve(c0->points[3], c1->points[3], c2->points[3], c3->points[3]);
+	otherAxis.push_back(d0);
+	otherAxis.push_back(d1);
+	otherAxis.push_back(d2);
+	otherAxis.push_back(d3);
     for(float u = 0; u <= 300; u++){
         getPoint(u/300.0);
     }
@@ -47,11 +54,17 @@ BezierBatch::BezierBatch(BezierCurve * c0, BezierCurve * c1, BezierCurve * c2, B
 	
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
+	glGenBuffers(1, &vboNormal);
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * x.size(), x.data(), GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glBindBuffer(GL_ARRAY_BUFFER, vboNormal);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * normals.size(), normals.data(), GL_STATIC_DRAW);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
 	glGenBuffers(1, &ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), indices.data(), GL_STATIC_DRAW);
@@ -68,10 +81,18 @@ void BezierBatch::getPoint(float t){
     glm::vec3 q1 = curves[1]->getPoint(t);
     glm::vec3 q2 = curves[2]->getPoint(t);
     glm::vec3 q3 = curves[3]->getPoint(t);
-    std::vector<glm::vec3> row;
+	glm::vec3 r0 = otherAxis[0]->getPoint(t);
+	glm::vec3 r1 = otherAxis[1]->getPoint(t);
+	glm::vec3 r2 = otherAxis[2]->getPoint(t);
+	glm::vec3 r3 = otherAxis[3]->getPoint(t);
+	BezierCurve* c = new BezierCurve(q0, q1, q2, q3);
+	BezierCurve* d = new BezierCurve(r0, r1, r2, r3);
     for(float v = 0.0; v <= 300.0; v++){
-        BezierCurve * c = new BezierCurve(q0,q1,q2,q3);
+       
         x.push_back(c->getPoint(v/300.0));
+		glm::vec3 yTangent = c->getTangent(v / 300.0);
+		glm::vec3 xTangent = d->getTangent(v / 300.0);
+		normals.push_back(glm::cross(xTangent,yTangent));
     }
 }
 

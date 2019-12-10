@@ -27,7 +27,7 @@
 #include "shader.h"
 #include "BezierBatch.h"
 
-#include "irrKlang-64bit-1.6.0/include/irrKlang.h"
+#include "./include/irrKlang.h"
 
 class Window
 {

@@ -28,10 +28,12 @@
 class BezierBatch : public Geometry{
 private:
     std::vector<BezierCurve *> curves;
+	std::vector<BezierCurve*> otherAxis;
     std::vector<glm::vec3> x;
+	std::vector<glm::vec3> normals;
 	std::vector<unsigned int> indices;
     GLuint vao;
-    GLuint vbo, ebo;
+    GLuint vbo, vboNormal, ebo;
 public:
     BezierBatch(BezierCurve * c0, BezierCurve * c1, BezierCurve * c2, BezierCurve * c3);
     void getPoint(float t);
