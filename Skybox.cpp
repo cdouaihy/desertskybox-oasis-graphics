@@ -78,12 +78,12 @@ Skybox::Skybox(){
     glBindVertexArray(0);
     std::vector<std::string> faces
     {
-           "sandcastle_lf.tga",
-           "sandcastle_rt.tga",
-           "sandcastle_up.tga",
-           "sandcastle_dn.tga",
-           "sandcastle_ft.tga",
-           "sandcastle_bk.tga"
+		   "sorbin_lf.tga",
+		   "sorbin_rt.tga",
+		   "sorbin_up.tga",
+		   "sorbin_dn.tga",
+		   "sorbin_ft.tga",
+		   "sorbin_bk.tga"
     };
 
     cubemap = loadCubemap(faces);

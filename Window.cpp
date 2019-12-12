@@ -86,10 +86,14 @@ BezierCurve * Window::curve14;
 BezierCurve * Window::curve15;
 BezierCurve * Window::curve16;
 
-BezierBatch * Window::b1;
-BezierBatch * Window::b2;
-BezierBatch * Window::b3;
-BezierBatch * Window::b4;
+BezierCurve* Window::terrain[4];
+
+
+BezierBatch* Window::b1;
+BezierBatch* Window::b2;
+BezierBatch* Window::b3;
+BezierBatch* Window::b4;
+BezierBatch* Window::ground;
 
 std::vector<BezierCurve *> Window::curves;
 
@@ -194,17 +198,17 @@ bool Window::initializeProgram() {
     glUseProgram(program);
 
     // Get the locations of uniform variables.
-    projectionLoc = glGetUniformLocation(program, "projection");
-    viewLoc = glGetUniformLocation(program, "view");
-    modelLoc = glGetUniformLocation(program, "model");
-    lightColorLoc = glGetUniformLocation(program, "lightAttr1");
-    lightPosLoc = glGetUniformLocation(program, "lightAttr2");
-    viewPosLoc = glGetUniformLocation(program, "viewPos");
-    ambientLoc = glGetUniformLocation(program, "material.ambient");
-    diffuseLoc = glGetUniformLocation(program, "material.diffuse");
-    specularLoc = glGetUniformLocation(program, "material.specular");
-    shinyLoc = glGetUniformLocation(program, "material.shininess");
-    condLoc = glGetUniformLocation(program, "isNormalCol");
+	projectionLoc = glGetUniformLocation(program, "projection");
+	viewLoc = glGetUniformLocation(program, "view");
+	modelLoc = glGetUniformLocation(program, "model");
+	lightColorLoc = glGetUniformLocation(starterProgram, "lightAttr1");
+	lightPosLoc = glGetUniformLocation(starterProgram, "lightAttr2");
+	viewPosLoc = glGetUniformLocation(starterProgram, "viewPos");
+	ambientLoc = glGetUniformLocation(starterProgram, "material.ambient");
+	diffuseLoc = glGetUniformLocation(starterProgram, "material.diffuse");
+	specularLoc = glGetUniformLocation(starterProgram, "material.specular");
+	shinyLoc = glGetUniformLocation(starterProgram, "material.shininess");
+	condLoc = glGetUniformLocation(program, "isNormalCol");
     
     glUseProgram(starterProgram);
     projectionCurveLoc = glGetUniformLocation(starterProgram, "projection");
@@ -313,6 +317,20 @@ bool Window::initializeObjects()
     b2 = new BezierBatch(curve5, curve6, curve7, curve8);
     b3 = new BezierBatch(curve9, curve10, curve11, curve12);
     b4 = new BezierBatch(curve13, curve14, curve15, curve16);
+	std::vector<glm::vec3> pullPoints2;
+	pullPoints2.push_back(glm::vec3(-40, 0, -120));
+	pullPoints2.push_back(glm::vec3(40, 0, -120));
+	pullPoints2.push_back(glm::vec3(-40, 0, -40));
+	pullPoints2.push_back(glm::vec3(40, 0, -40));
+	pullPoints2.push_back(glm::vec3(-40, 0, 40));
+	pullPoints2.push_back(glm::vec3(40, 0, 40));
+	pullPoints2.push_back(glm::vec3(-40, 0, 120));
+	pullPoints2.push_back(glm::vec3(40, 0, 120));
+	terrain[0] = new BezierCurve(glm::vec3(-120, -1, -120), pullPoints2[0], pullPoints2[1], glm::vec3(120, 0, -120));
+	terrain[1] = new BezierCurve(glm::vec3(-120, -1, -40), pullPoints2[2], pullPoints2[3], glm::vec3(120, 0, -40));
+	terrain[2] = new BezierCurve(glm::vec3(-120, -1, 40), pullPoints2[4], pullPoints2[5], glm::vec3(120, 0, 40));
+	terrain[3] = new BezierCurve(glm::vec3(-120, -1, 120), pullPoints2[6], pullPoints2[7], glm::vec3(120, 0, 120));
+	ground = new BezierBatch(terrain[0], terrain[1], terrain[2], terrain[3]);
     
     curves.push_back(curve1);
     curves.push_back(curve2);
@@ -526,7 +544,24 @@ void Window::displayCallback(GLFWwindow* window)
     b2->draw();
     b3->draw();
     b4->draw();
-
+	glUseProgram(starterProgram);
+	glm::vec3 ambient = glm::vec3(0.9f, 0.9f, 0.9f);
+	glm::vec3 diffuse = glm::vec3(0.9f, 0.9f, 0.9f);
+	glm::vec3 specular = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::vec3 lightColor = glm::vec3(0.3f, 0.3f, 0.3f);
+	glm::vec3 lightPosition = glm::vec3(0.0f, 30.0f, -30.0f);
+	float shininess = 0.0f;
+	glUniformMatrix4fv(projectionCurveLoc, 1, GL_FALSE, glm::value_ptr(projection));
+	glUniformMatrix4fv(viewCurveLoc, 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(modelCurveLoc, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3fv(ambientLoc, 1, glm::value_ptr(ambient));
+	glUniform3fv(diffuseLoc, 1, glm::value_ptr(diffuse));
+	glUniform3fv(specularLoc, 1, glm::value_ptr(specular));
+	glUniform3fv(lightColorLoc, 1, glm::value_ptr(lightColor));
+	glUniform3fv(lightPosLoc, 1, glm::value_ptr(lightPosition));
+	glUniform3fv(viewPosLoc, 1, glm::value_ptr(eye));
+	glUniform1f(shinyLoc, shininess);
+	ground->draw();
     
 
     glUseProgram(skyboxProgram);

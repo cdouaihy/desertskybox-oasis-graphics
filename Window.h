@@ -109,6 +109,7 @@ public:
     static BezierCurve * curve14;
     static BezierCurve * curve15;
     static BezierCurve * curve16;
+	static BezierCurve* terrain[4];
     static int curr;
     static float waveDegree;
     static std::vector<BezierCurve *> curves;
@@ -117,6 +118,7 @@ public:
     static BezierBatch * b2;
     static BezierBatch * b3;
     static BezierBatch * b4;
+	static BezierBatch* ground;
 
     static Object * currentObj;
     static Geometry * currentNode;

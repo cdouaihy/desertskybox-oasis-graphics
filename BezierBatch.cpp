@@ -36,22 +36,26 @@ BezierBatch::BezierBatch(BezierCurve * c0, BezierCurve * c1, BezierCurve * c2, B
     // Generate a vertex array (VAO) and two vertex buffer objects (VBO).
 
     // GENERATE INDICES
-    int count = 0;
-    for (int x = 0; x < 500; x++) {
-        int index1 = (x * 501) + 1; //based on height
-        for (int y = 0; y < 500; y++) {
-            int index2 = index1 + y;
-            indices.push_back(index2);
-            indices.push_back(index2 + 501);
-            indices.push_back(index2 + 1);
-            indices.push_back(index2 + 501);
-            if (x == 499 ) {
-                indices.push_back(index2 + 1);
-            }
-            indices.push_back(index2 + 1);
-            indices.push_back(index2 + 501 + 1);
-        }
-    }
+	int count = 0;
+	for (int x = 0; x < 500; x++) {
+		int index1 = (x * 501) + 1; //based on height
+		for (int y = 0; y < 500; y++) {
+			int index2 = index1 + y;
+
+			indices.push_back(index2);
+			indices.push_back(index2 + 501);
+			indices.push_back(index2 + 1);
+			indices.push_back(index2 + 501); // MAINTAIN WINDING
+			if (x == 499 && y == 499) {
+				indices.push_back(index2 + 1);
+
+			}
+			indices.push_back(index2 + 1);
+			indices.push_back(index2 + 501 + 1);
+
+		}
+
+	}
     
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
