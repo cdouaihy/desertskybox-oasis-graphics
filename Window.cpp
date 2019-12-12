@@ -107,7 +107,7 @@ PointCloud * Window::sphere;
 glm::vec3 Window::lightPos(5.0f,5.0f,5.0f);
 glm::mat4 Window::projection; // Projection matrix.
 
-glm::vec3 Window::eye(0, 5, 50); // Camera position.
+glm::vec3 Window::eye(0, 4, 70); // Camera position.
 glm::vec3 Window::center(0, 0, 0); // The point we are looking at.
 glm::vec3 Window::up(0, 1, 0); // The up direction of the camera.
 glm::vec3 Window::start(0,0,0);
@@ -245,6 +245,7 @@ bool Window::initializeObjects()
     sphereT = new Transform(model);
     sphereGeo = new Geometry("sphere.obj");
     sphereT->addChild(sphereGeo);
+	bear = new PointCloud("bear.obj",10.0f);
 
     anchorPoints.push_back(glm::vec3(0,0,0));
     anchorPoints.push_back(glm::vec3(15,0,0));
@@ -553,6 +554,9 @@ void Window::displayCallback(GLFWwindow* window)
 	float shininess = 0.0f;
 	glUniformMatrix4fv(projectionCurveLoc, 1, GL_FALSE, glm::value_ptr(projection));
 	glUniformMatrix4fv(viewCurveLoc, 1, GL_FALSE, glm::value_ptr(view));
+	glm::vec3 translate(0.0f, 0.0f, -30.0f);
+	//glm::mat4 transform = glm::translate(glm::mat4(), translate);
+
 	glUniformMatrix4fv(modelCurveLoc, 1, GL_FALSE, glm::value_ptr(model));
 	glUniform3fv(ambientLoc, 1, glm::value_ptr(ambient));
 	glUniform3fv(diffuseLoc, 1, glm::value_ptr(diffuse));
@@ -562,6 +566,9 @@ void Window::displayCallback(GLFWwindow* window)
 	glUniform3fv(viewPosLoc, 1, glm::value_ptr(eye));
 	glUniform1f(shinyLoc, shininess);
 	ground->draw();
+	glUniformMatrix4fv(modelCurveLoc, 1, GL_FALSE, glm::value_ptr(glm::translate(bear->getModel(),translate)));
+	//glTranslatef(0.0f,0.0f,-12.0f);
+	bear->draw();
     
 
     glUseProgram(skyboxProgram);
@@ -615,7 +622,7 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
             modeThree = true;
             break;
         case GLFW_KEY_W:
-            Window::eye += cameraSpeed * direction;
+            Window::eye += cameraSpeed * glm::vec3(direction.x,0,direction.z);
             if(Window::delay % 6 == 0){
                 SoundEngine->play2D("Single-footstep-snow.wav", GL_FALSE);
             }
@@ -634,7 +641,7 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
             }
             break;
         case GLFW_KEY_A:
-            Window::eye -= glm::normalize(glm::cross(direction, up)) * cameraSpeed;
+            Window::eye -= glm::normalize(glm::cross(glm::vec3(direction.x, 0, direction.z), up)) * cameraSpeed;
             if(Window::delay % 3 == 0){
                 SoundEngine->play2D("Single-footstep-snow.wav", GL_FALSE);
             }
@@ -653,7 +660,7 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
                 }
             break;
         case GLFW_KEY_S:
-            Window::eye -= cameraSpeed * direction;
+            Window::eye -= cameraSpeed * glm::vec3(direction.x, 0, direction.z);
             if(Window::delay % 3 == 0){
                 SoundEngine->play2D("Single-footstep-snow.wav", GL_FALSE);
             }
@@ -672,7 +679,7 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
                 }
             break;
         case GLFW_KEY_D:
-            Window::eye += glm::normalize(glm::cross(direction, up)) * cameraSpeed;
+            Window::eye += glm::normalize(glm::cross(glm::vec3(direction.x, 0, direction.z), up)) * cameraSpeed;
             if(Window::delay % 3 == 0){
                 SoundEngine->play2D("Single-footstep-snow.wav", GL_FALSE);
             }
