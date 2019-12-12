@@ -27,16 +27,16 @@
 #include "shader.h"
 #include "BezierBatch.h"
 
-#include "./include/irrKlang.h"
+#include "./irrKlang-64bit-1.6.0/include/irrKlang.h"
 
 class Window
 {
 public:
-	static int width;
-	static int height;
-	static const char* windowTitle;
-	static Cube* cube;
-	static PointCloud * cubePoints;
+    static int width;
+    static int height;
+    static const char* windowTitle;
+    static Cube* cube;
+    static PointCloud * cubePoints;
     static PointCloud * bunny;
     static PointCloud * bear;
     static PointCloud * dragon;
@@ -101,12 +101,24 @@ public:
     static BezierCurve * curve6;
     static BezierCurve * curve7;
     static BezierCurve * curve8;
+    static BezierCurve * curve9;
+    static BezierCurve * curve10;
+    static BezierCurve * curve11;
+    static BezierCurve * curve12;
+    static BezierCurve * curve13;
+    static BezierCurve * curve14;
+    static BezierCurve * curve15;
+    static BezierCurve * curve16;
     static int curr;
+    static float waveDegree;
     static std::vector<BezierCurve *> curves;
     
     static BezierBatch * b1;
+    static BezierBatch * b2;
+    static BezierBatch * b3;
+    static BezierBatch * b4;
 
-	static Object * currentObj;
+    static Object * currentObj;
     static Geometry * currentNode;
     static float lastTime;
     static float currentTime;
@@ -123,26 +135,28 @@ public:
     static int delay;
     
     static irrklang::ISoundEngine * SoundEngine;
-    
-	static glm::mat4 projection;
-	static glm::mat4 view;
-	static glm::vec3 eye, center, up, direction, cameraRight, cameraUp;
+    static irrklang::ISoundSource * waterSound;
+    static glm::mat4 projection;
+    static glm::mat4 view;
+    static glm::vec3 eye, center, up, direction, cameraRight, cameraUp;
     static glm::vec2 point;
     static glm::vec3 start;
     static glm::vec3 lightPos;
-    static bool isRotate, modeOne, modeTwo, modeThree, isScaled, isSphere, firstMouse;
+    static bool isRotate, modeOne, modeTwo, modeThree, isScaled, isWaterSound, firstMouse, isWave;
     static int isNorm;
     static float fov;
-	static GLuint starterProgram, program, anchProgram, pullProgram, skyboxProgram, projectionLoc, viewLoc, projectionSkyLoc, viewSkyLoc, projectionCurveLoc, viewCurveLoc, modelCurveLoc,projectionAnchLoc, viewAnchLoc, modelAnchLoc, projectionPullLoc, viewPullLoc, modelPullLoc,modelLoc, modelSkyLoc, colorLoc, lightPosLoc, lightColorLoc, viewPosLoc, ambientLoc, diffuseLoc, specularLoc, shinyLoc, condLoc;
+    static GLuint starterProgram, program, anchProgram, pullProgram, skyboxProgram, projectionLoc, viewLoc, projectionSkyLoc, viewSkyLoc, projectionCurveLoc, viewCurveLoc, modelCurveLoc,projectionAnchLoc, viewAnchLoc, modelAnchLoc, projectionPullLoc, viewPullLoc, modelPullLoc,modelLoc, modelSkyLoc, colorLoc, lightPosLoc, lightColorLoc, viewPosLoc, ambientLoc, diffuseLoc, specularLoc, shinyLoc, condLoc;
 
-	static bool initializeProgram();
-	static bool initializeObjects();
-	static void cleanUp();
-	static GLFWwindow* createWindow(int width, int height);
-	static void resizeCallback(GLFWwindow* window, int width, int height);
-	static void idleCallback();
-	static void displayCallback(GLFWwindow*);
-	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+    static bool initializeProgram();
+    static bool initializeObjects();
+    static void cleanUp();
+    static void animateWaves();
+    static GLFWwindow* createWindow(int width, int height);
+    static void resizeCallback(GLFWwindow* window, int width, int height);
+    static void idleCallback();
+    static void initializeBatch();
+    static void displayCallback(GLFWwindow*);
+    static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
     static void mouseCallback(GLFWwindow* window, int button, int action, int mods);
     static void cursorCallback(GLFWwindow* window, double xpos, double ypos);
     static glm::vec3 trackBallMapping(glm::vec2 point);

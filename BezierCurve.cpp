@@ -51,12 +51,12 @@ glm::vec3 BezierCurve::getPoint(float t){
 }
 
 glm::vec3 BezierCurve::getTangent(float t) {
-	glm::vec3 a = -points[0] + 3.0f * points[1] - 3.0f * points[2] + points[3];
-	glm::vec3 b = 3.0f * points[0] - 6.0f * points[1] + 3.0f * points[2];
-	glm::vec3 c = -3.0f * points[0] + 3.0f * points[1];
-	glm::vec3 d = points[0];
-	glm::vec3 output = (a * (3.0f) * (t * t)) + (b * 2.0f * t) + c;
-	return output;
+    glm::vec3 a = -points[0] + 3.0f * points[1] - 3.0f * points[2] + points[3];
+    glm::vec3 b = 3.0f * points[0] - 6.0f * points[1] + 3.0f * points[2];
+    glm::vec3 c = -3.0f * points[0] + 3.0f * points[1];
+    glm::vec3 d = points[0];
+    glm::vec3 output = (a * (3.0f) * (t * t)) + (b * 2.0f * t) + c;
+    return output;
 }
 
 double BezierCurve::getT(glm::vec3 pos){
@@ -77,4 +77,13 @@ void BezierCurve::draw(){
     glBindVertexArray(0);
 }
 
-
+void BezierCurve::update(glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3){
+    points.push_back(p0);
+    points.push_back(p1);
+    points.push_back(p2);
+    points.push_back(p3);
+    
+    for(float i = 0; i <= 500; i++){
+        x.push_back(getPoint(i/500.0));
+    }
+}

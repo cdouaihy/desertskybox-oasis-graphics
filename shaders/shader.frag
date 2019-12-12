@@ -15,6 +15,6 @@ void main()
     vec3 R2 = refract(I, normalize(Normal), ratio);
     vec4 FragColorReflect = vec4(texture(skybox, R1).rgb, 1.0);
     vec4 FragColorRefract = vec4(texture(skybox, R2).rgb, 1.0);
-    FragColor = mix(FragColorReflect, FragColorRefract, 0.35);
+    FragColor = mix(FragColorReflect, FragColorRefract, 0.5);
     
 }
